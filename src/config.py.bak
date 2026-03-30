@@ -36,14 +36,6 @@ class Settings:
     enable_table_detection: bool
     enable_layout_image_slicing: bool
     enable_vision_summary: bool
-    enable_model_reranker: bool
-    reranker_model: str
-    reranker_top_n: int
-    reranker_weight: float
-    reranker_use_fp16: bool
-    reranker_device: str | None
-    reranker_normalize: bool
-    reranker_cache_dir: Path
 
 
 base_dir = Path(__file__).resolve().parent.parent
@@ -54,8 +46,7 @@ processed_dir = data_dir / "processed"
 slice_dir = processed_dir / "slices"
 store_dir = data_dir / "stores"
 manifest_dir = data_dir / "manifests"
-reranker_cache_dir = data_dir / "reranker_cache"
-for folder in [data_dir, raw_dir, processed_dir, slice_dir, store_dir, manifest_dir, reranker_cache_dir]:
+for folder in [data_dir, raw_dir, processed_dir, slice_dir, store_dir, manifest_dir]:
     folder.mkdir(parents=True, exist_ok=True)
 
 settings = Settings(
@@ -84,12 +75,4 @@ settings = Settings(
     enable_table_detection=os.getenv("ENABLE_TABLE_DETECTION", "1") == "1",
     enable_layout_image_slicing=os.getenv("ENABLE_LAYOUT_IMAGE_SLICING", "1") == "1",
     enable_vision_summary=os.getenv("ENABLE_VISION_SUMMARY", "1") == "1",
-    enable_model_reranker=os.getenv("ENABLE_MODEL_RERANKER", "1") == "1",
-    reranker_model=os.getenv("RERANKER_MODEL", "BAAI/bge-reranker-v2-m3"),
-    reranker_top_n=int(os.getenv("RERANKER_TOP_N", "12")),
-    reranker_weight=float(os.getenv("RERANKER_WEIGHT", "0.65")),
-    reranker_use_fp16=os.getenv("RERANKER_USE_FP16", "1") == "1",
-    reranker_device=os.getenv("RERANKER_DEVICE") or None,
-    reranker_normalize=os.getenv("RERANKER_NORMALIZE", "1") == "1",
-    reranker_cache_dir=reranker_cache_dir,
 )

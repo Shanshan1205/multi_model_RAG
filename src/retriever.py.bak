@@ -4,7 +4,6 @@ import re
 
 from src.config import settings
 from src.embedder import OpenAIEmbedder
-from src.reranker import BGEReranker
 from src.schemas import IndexRecord, SearchHit, SearchResponse
 from src.utils import overlap_ratio
 from src.vector_store import VectorStore
@@ -15,7 +14,6 @@ class MultiModalRetriever:
         self.text_store = text_store
         self.image_store = image_store
         self.embedder = embedder
-        self.model_reranker = BGEReranker()
 
     def search(self, question: str, top_k: int) -> SearchResponse:
         query_embedding = self.embedder.embed_text(question)
@@ -26,26 +24,15 @@ class MultiModalRetriever:
         for record, semantic in text_candidates + image_candidates:
             hit = self._build_hit(question, record, semantic)
             existing = merged.get(hit.record_id)
-            if existing is None or hit.base_score > existing.base_score:
+            if existing is None or hit.final_score > existing.final_score:
                 merged[hit.record_id] = hit
 
-        coarse_results = sorted(merged.values(), key=lambda item: item.base_score, reverse=True)
-        rerank_pool = coarse_results[: settings.reranker_top_n]
-        reranked_head = self.model_reranker.rerank(question=question, hits=rerank_pool)
-
-        if len(coarse_results) > settings.reranker_top_n:
-            tail = coarse_results[settings.reranker_top_n :]
-            for hit in tail:
-                hit.model_rerank_score = 0.0
-                hit.final_score = hit.base_score
-            reranked_head.extend(tail)
-
-        results = sorted(reranked_head, key=lambda item: item.final_score, reverse=True)[:top_k]
+        results = sorted(merged.values(), key=lambda item: item.final_score, reverse=True)[:top_k]
         return SearchResponse(question=question, results=results)
 
     def _build_hit(self, question: str, record: IndexRecord, semantic_score: float) -> SearchHit:
         structural_score = self._structural_score(question, record)
-        base_score = settings.rerank_beta * structural_score + (1.0 - settings.rerank_beta) * semantic_score
+        final_score = settings.rerank_beta * structural_score + (1.0 - settings.rerank_beta) * semantic_score
         return SearchHit(
             record_id=record.record_id,
             store_name=record.store_name,
@@ -59,9 +46,7 @@ class MultiModalRetriever:
             metadata=record.metadata,
             semantic_score=float(semantic_score),
             structural_score=float(structural_score),
-            base_score=float(base_score),
-            model_rerank_score=0.0,
-            final_score=float(base_score),
+            final_score=float(final_score),
         )
 
     def _structural_score(self, question: str, record: IndexRecord) -> float:

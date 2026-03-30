@@ -86,9 +86,7 @@ class SearchHit:
     metadata: dict[str, Any]
     semantic_score: float
     structural_score: float
-    base_score: float
-    model_rerank_score: float = 0.0
-    final_score: float = 0.0
+    final_score: float
 
 
 @dataclass

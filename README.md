@@ -1,8 +1,8 @@
-# Multi Modal RAG
+# Multi Modal RAG Lite
 
-多模态 RAG 项目
+多模态 RAG 项目。
 
-核心功能：
+核心保留：
 - 解析流水线：布局检测 / 表格结构化 / 公式识别
 - 输出文本 + 结构化信息 + 图像切片
 - 文本与图像/表格分模态编码，并支持 `alpha` 融合
@@ -67,6 +67,3 @@ python app.py --mode index --pdf ./demo.pdf
 ```bash
 python app.py --mode query --question "图表里营收趋势如何？" --top_k 6
 ```
-
-
-

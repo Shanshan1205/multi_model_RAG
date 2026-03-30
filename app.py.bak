@@ -49,20 +49,13 @@ def query_document(question: str, top_k: int | None = None) -> None:
     print("\n========== RETRIEVED RESULTS ==========")
     for idx, item in enumerate(response.results, start=1):
         print(
-            f"[{idx}] final={item.final_score:.4f} "
-            f"model={item.model_rerank_score:.4f} "
-            f"base={item.base_score:.4f} "
-            f"semantic={item.semantic_score:.4f} "
-            f"struct={item.structural_score:.4f} "
-            f"store={item.store_name} page={item.page_num} "
+            f"[{idx}] score={item.final_score:.4f} semantic={item.semantic_score:.4f} "
+            f"struct={item.structural_score:.4f} store={item.store_name} page={item.page_num} "
             f"type={item.block_type} bbox={item.bbox}"
         )
         print(item.display_text[:500])
         if item.image_path:
             print(f"image_path={item.image_path}")
-        reranker_error = item.metadata.get("reranker_error")
-        if reranker_error:
-            print(f"reranker_error={reranker_error}")
         print("-" * 100)
 
 
