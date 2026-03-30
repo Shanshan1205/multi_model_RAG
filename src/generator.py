@@ -40,7 +40,7 @@ class OpenAIAnswerGenerator:
             {
                 "type": "input_text",
                 "text": (
-                    "你是一个严谨的多模态 RAG 助手。请严格依据提供的证据回答。\n\n"
+                    "你是一个严谨的多模态PDF分析助手。请严格依据提供的证据回答。\n\n"
                     f"用户问题：{question}\n\n"
                     "证据如下：\n"
                     + "\n".join(context_lines)
